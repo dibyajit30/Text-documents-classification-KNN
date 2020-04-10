@@ -40,7 +40,7 @@ public class App
    	   ArrayList<String> ans = new ArrayList<>();
    	   list = pp.readFromFile(stopwords, file);
    	   
-   	   HashMap<String, Integer> map = dm.getFreq(list, uniqueWords, freq);
+   	   HashMap<String, Integer> map = dm.getFreq(list, uniqueWords, freq, true);
    	   listmap.add(map);
       }
    	 
@@ -50,12 +50,13 @@ public class App
   	   ArrayList<String> ans = new ArrayList<>();
   	   list = pp.readFromFile(stopwords, file);
   	   
-  	   HashMap<String, Integer> map = dm.getFreq(list, uniqueWords, freq);
+  	   HashMap<String, Integer> map = dm.getFreq(list, uniqueWords, freq, false);
   	   listmap.add(map);
      }
    	 
    	  
    	  int[][] documentMatrix = dm.makeMatrix(listmap, uniqueWords);
+   	  dm.setIDFS(documentMatrix, trainingSetSize);
    	  double[][] transformedMatrix = dm.makeTM(documentMatrix);
    	  
    	// Train test split
@@ -71,13 +72,14 @@ public class App
    	}
    	  
    	int[] pred_y = new int[testSetSize];
-   	Classifier_Kmeans classifier = new Classifier_Kmeans(3, Classifier_Kmeans.distance.Cosine);
+   	Classifier_Kmeans classifier = new Classifier_Kmeans(5, Classifier_Kmeans.distance.Cosine);
    	classifier.fit_train(train_x, train_y);
    	pred_y = classifier.fit(test_x);
+   	System.out.println("Predicted labels");
    	for(int i=0; i<testSetSize; i++) {
    		System.out.print(pred_y[i] + " ");
    	}
-   	
+   	System.out.println();
    	Performance performance = new Performance();
    	performance.accuracy(test_y, pred_y);
    	performance.precision(test_y, pred_y);

@@ -8,16 +8,21 @@ import java.util.HashSet;
 public class documentMatrix {
     
 	ArrayList<String> ordered_uniqueWords = new ArrayList<>();
+	int no_of_docs;
+	double[] idfs;
 	
-	public HashMap<String, Integer> getFreq(ArrayList<String> list, ArrayList<String> uniqueWords, HashMap<String, Integer> freq)
+	public HashMap<String, Integer> getFreq(ArrayList<String> list, ArrayList<String> uniqueWords, HashMap<String, Integer> freq, boolean isTraining)
 	{
-		for(String s:list)
-		   {
-			   if(!uniqueWords.contains(s))
+		if(isTraining) {
+			for(String s:list)
 			   {
-				   uniqueWords.add(s);
+				   if(!uniqueWords.contains(s))
+				   {
+					   uniqueWords.add(s);
+				   }
 			   }
-		   }
+		}
+		
 		
 		HashMap<String, Integer> freqCount = new HashMap<>();
 		for(String s:list)
@@ -61,22 +66,16 @@ public class documentMatrix {
 		return documentMatrix;
 	}
 	
-	public double[][] makeTM(int[][] documentMatrix)
-	{
-		double tf=0.0;
-		double idf=0.0;
-		int sum;
+	public void setIDFS(int[][] documentMatrix, int length) {
+		no_of_docs = length;
+		idfs = new double[documentMatrix[0].length];
 		int i=0;
 		int j=0;
 		int count;
-		int no_of_docs = documentMatrix.length;
-		double[] idfs = new double[documentMatrix[0].length];
-	    double[][] transformedMatrix = new double[documentMatrix.length][documentMatrix[0].length];
-		
 		for(j=0;j<documentMatrix[0].length;j++)
 		{
 			count=0;
-			for(i=0;i<documentMatrix.length;i++)
+			for(i=0;i<length;i++)
 			{
 				if(documentMatrix[i][j]!=0)
 				{
@@ -85,6 +84,19 @@ public class documentMatrix {
 			}
 			idfs[j]=count;
 		}
+	}
+	
+	public double[][] makeTM(int[][] documentMatrix)
+	{
+		double tf=0.0;
+		double idf=0.0;
+		int sum;
+		int i=0;
+		int j=0;
+		
+	    double[][] transformedMatrix = new double[documentMatrix.length][documentMatrix[0].length];
+		
+		
 		
 		for(i=0;i<documentMatrix.length;i++)
 		{
@@ -152,8 +164,5 @@ public class documentMatrix {
 		}
 		
 		return keyWords;
-	}
-	
-	
-	
+	}	
 }
