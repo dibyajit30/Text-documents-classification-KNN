@@ -154,7 +154,7 @@ public class Classifier_Knn {
 			fuzzyLabels[label] += 1;
 		}
 		for(int i=0; i<uniqueLabelsSize; i++) {
-			fuzzyLabels[i] = (fuzzyLabels[i]*100)/uniqueLabelsSize;
+			fuzzyLabels[i] = Math.round((fuzzyLabels[i]*100)/k);
 		}
 		return fuzzyLabels;
 	}

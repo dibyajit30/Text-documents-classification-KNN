@@ -74,7 +74,7 @@ public class App
    	 * Instantiating knn. Constructor takes two parameters - K value(greater than zero),
    	 * Euclidean/Cosine distance for document similarity.
    	 */
-   	Classifier_Knn classifier = new Classifier_Knn(4, Classifier_Knn.distance.Euclidean);
+   	Classifier_Knn classifier = new Classifier_Knn(4, Classifier_Knn.distance.Cosine);
    	classifier.fit_train(train_x, train_y);
    	pred_y = classifier.fit(test_x);
    	System.out.println("Predicted labels");
@@ -91,6 +91,19 @@ public class App
    	performance.accuracy(test_y, pred_y);
    	performance.precision(test_y, pred_y);
    	performance.recall(test_y, pred_y);
-
+    
+	/*
+	 * Predicting through fuzzy-knn.
+	 */
+	double[][] pred_fuzzy = classifier.fit_fuzzy(test_x);
+	int uniqueLabelsSize = pred_fuzzy[0].length;
+	System.out.println("Fuzzy labels");
+	for(int i=0; i<testSetSize; i++) {
+		System.out.print("Document:"+(i+1));
+		for(int j=0; j<uniqueLabelsSize; j++) {
+			System.out.print(" Category:" + j + " " + pred_fuzzy[i][j] + "%");
+		}
+		System.out.println();
+	}
     }
 }
