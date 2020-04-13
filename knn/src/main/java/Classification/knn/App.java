@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import Classification.knn.Classifier_Kmeans.distance;
-
 public class App 
 {
 	public static void main( String[] args ) throws IOException
@@ -25,7 +23,7 @@ public class App
         //Training labels
         int[] train_y = new int[] {0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2};
         //Test labels
-        int[] test_y = new int[] {0,0,0,0,1,1,2,2,0,0};
+        int[] test_y = new int[] {2,2,2,2,1,1,0,0,1,1};
         
         PreProcessing pp = new PreProcessing();
         documentMatrix dm = new documentMatrix();
@@ -72,12 +70,21 @@ public class App
    	}
    	  
    	int[] pred_y = new int[testSetSize];
-   	Classifier_Kmeans classifier = new Classifier_Kmeans(5, Classifier_Kmeans.distance.Cosine);
+   	/*
+   	 * Instantiating knn. Constructor takes two parameters - K value(greater than zero),
+   	 * Euclidean/Cosine distance for document similarity.
+   	 */
+   	Classifier_Knn classifier = new Classifier_Knn(4, Classifier_Knn.distance.Euclidean);
    	classifier.fit_train(train_x, train_y);
    	pred_y = classifier.fit(test_x);
    	System.out.println("Predicted labels");
    	for(int i=0; i<testSetSize; i++) {
    		System.out.print(pred_y[i] + " ");
+   	}
+   	System.out.println();
+   	System.out.println("True labels");
+   	for(int i=0; i<testSetSize; i++) {
+   		System.out.print(test_y[i] + " ");
    	}
    	System.out.println();
    	Performance performance = new Performance();

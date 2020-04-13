@@ -1,17 +1,18 @@
 package Classification.knn;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-public class Classifier_Kmeans {
+public class Classifier_Knn {
 	private double[][] trainingData;
 	private int[] trainingLabels;
 	private int k;
 	enum distance {Euclidean, Cosine};
 	public distance measure;
 	
-	public Classifier_Kmeans(int k, distance measure) {
+	public Classifier_Knn(int k, distance measure) {
 		this.k = k;
 		this.measure = measure;
 	}
@@ -42,7 +43,7 @@ public class Classifier_Kmeans {
 		double sqrta1 = Math.sqrt(a1Denom);
 		double sqrta2 = Math.sqrt(a2Denom);
 		
-		return dotProduct / (sqrta1*sqrta2);
+		return Math.acos(dotProduct / (sqrta1*sqrta2));
 	}
 	
 	public void fit_train(double[][] trainingData, int[] labels) {
@@ -109,5 +110,62 @@ public class Classifier_Kmeans {
 			}
 		}
 		return mode;
+	}
+	
+	public double[][] fit_fuzzy(double[][] testData){
+		int testSize = testData.length;
+		ArrayList<Integer> uniqueLabels = getUniqueLabels();
+		double[][] categoryPercentages = new double[testSize][uniqueLabels.size()];
+		for(int i=0; i<testSize; i++) {
+			categoryPercentages[i] = getFuzzyLabels(testData[i], uniqueLabels);
+		}
+		return categoryPercentages;
+	}
+
+	private double[] getFuzzyLabels(double[] testData, ArrayList<Integer> uniqueLabels) {
+		int uniqueLabelsSize = uniqueLabels.size();
+		double[] fuzzyLabels = new double[uniqueLabelsSize];
+		int[] allLabels = new int[k];
+		int categorisedLabel;
+		double[][] trainedData = this.trainingData;
+		int[] trainedLabel = this.trainingLabels;
+		double currentDistance;
+		int minIndex;
+		for(int i=0; i<k; i++) {
+			double minDistance = Integer.MAX_VALUE;
+			minIndex = 0;
+			for(int j=0; j<trainedData.length; j++) {
+				if(this.measure == distance.Euclidean) {
+					currentDistance = getEuclideanDis(testData, trainedData[j]);
+				}
+				else {
+					currentDistance = getCosineDis(testData, trainedData[j]);
+				}
+				if(currentDistance < minDistance) {
+					minDistance = currentDistance;
+					minIndex = j;
+				}
+			}
+			allLabels[i] = trainedLabel[minIndex];
+			trainedLabel = ArrayUtils.remove(trainedLabel, minIndex);
+			trainedData = ArrayUtils.remove(trainedData, minIndex);
+		}
+		for(int label: allLabels) {
+			fuzzyLabels[label] += 1;
+		}
+		for(int i=0; i<uniqueLabelsSize; i++) {
+			fuzzyLabels[i] = (fuzzyLabels[i]*100)/uniqueLabelsSize;
+		}
+		return fuzzyLabels;
+	}
+
+	private ArrayList<Integer> getUniqueLabels() {
+		ArrayList<Integer> uniqueLabels =  new ArrayList<Integer>();
+		for(int i=0; i<trainingLabels.length; i++) {
+			if(!uniqueLabels.contains(trainingLabels[i])) {
+				uniqueLabels.add(trainingLabels[i]);
+			}
+		}
+		return uniqueLabels;
 	}
 }
